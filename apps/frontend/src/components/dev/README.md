@@ -2,6 +2,9 @@
 
 Files in this directory are **not for production use**.
 
+This is the **only** dev-only component directory. The old
+`components/__dev__/` copy was removed — put new dev-only components here.
+
 ## What goes here
 
 - Components that exist solely to smoke-test or exercise infrastructure (Apollo, GraphQL, etc.)
