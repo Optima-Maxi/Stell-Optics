@@ -51,3 +51,10 @@ build/
 
 # OS artefacts
 .DS_Store
+
+# migration tooling artefacts
+deploy-migrations.log
+.migration-audit-before.json
+
+# additional snapshot formats (e.g. Vitest inline snapshots)
+*.snap
