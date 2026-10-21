@@ -7,7 +7,7 @@ import { initSentry, Sentry } from "./lib/sentry";
 import { requestLogger } from "./middleware/requestLogger";
 import { corsMiddleware, helmetMiddleware } from "./middleware/security";
 import { authRateLimiter } from "./middleware/rateLimiter";
-import { requireAdmin, requireAuth, requireAuthForWrites } from "./middleware/auth";
+import { requireAdmin, requireAuth } from "./middleware/auth";
 import { errorHandler } from "./middleware/errorHandler";
 import { captureRawBody } from "./middleware/rawBody";
 import { healthRouter } from "./routes/health";
@@ -32,7 +32,7 @@ export function createApp(): Express {
   app.use(express.json({ verify: captureRawBody }));
   app.use("/api/auth", authRateLimiter);
   app.use("/health", healthRouter);
-  app.use("/api/listings", requireAuthForWrites, listingsRouter);
+  app.use("/api/listings", listingsRouter);
   app.use("/api/saved-searches", requireAuth, savedSearchesRouter);
   app.use("/api/watchlist", requireAuth, watchlistRouter);
   app.use("/webhooks", webhookRouter);
@@ -43,7 +43,7 @@ export function createApp(): Express {
   // #155 — Immutable changelog
   app.use("/api/changelog", requireAuth, changelogRouter);
   // #156 — Dispute state machine
-  app.use("/api/disputes", requireAuth, disputesRouter);
+  app.use("/api/disputes", disputesRouter);
   // #240 — Account deletion / anonymization
   app.use("/api/users", usersRouter);
   app.use(errorHandler);
