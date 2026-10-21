@@ -95,7 +95,7 @@ pattern across `single-release/` vs `multi-release/` variants.
 | Basename | Paths | Recommendation |
 |---|---|---|
 | `ApolloTestComponent.tsx` | `components/__dev__/` and `components/dev/` | `__dev__/` is the old location; `dev/` is current. Delete `__dev__/ApolloTestComponent.tsx`. |
-| `EscrowStatusBadge.tsx` | `components/dashboard/` and `components/escrow/` | Two visually different badges. The `dashboard/` version is simpler. **Keep both; rename `dashboard/` copy to `DashboardEscrowStatusBadge.tsx` to remove ambiguity.** |
+| `EscrowStatusBadge.tsx` | `components/dashboard/` and `components/escrow/` | ~~Two visually different badges. The `dashboard/` version is simpler. Keep both; rename `dashboard/` copy to `DashboardEscrowStatusBadge.tsx` to remove ambiguity.~~ **RESOLVED (#368):** Consolidated into `components/escrow/EscrowStatusBadge.tsx` supporting both static (`status` prop) and polling (`escrowId`/`signer` props) modes. The `dashboard/` copy has been deleted. |
 | `Header.tsx` | `components/layouts/Header.tsx` and `layouts/Header.tsx` | The `layouts/Header.tsx` at the `src/` level appears to be the newer, more complete version. **Delete `components/layouts/Header.tsx` and update its import sites.** |
 | `NotificationPreferences.tsx` | `dashboard/profile/` and `notifications/` | Different purposes (settings form vs live preference toggle). **Keep both; no rename needed.** |
 | `ConnectionStatus.tsx` | `auth/wallet/` and `notifications/` | Completely different components (wallet status vs WebSocket indicator). **Keep both; no rename needed.** |
