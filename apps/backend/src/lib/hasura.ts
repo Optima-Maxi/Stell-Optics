@@ -1,5 +1,22 @@
+/**
+ * Low-level Hasura transport (the bottom layer of backend → Hasura access).
+ *
+ * How backend code talks to Hasura:
+ *
+ *   routes / jobs  →  services/hasura.service.ts (HasuraService)  →  lib/hasura.ts (this file)  →  Hasura
+ *
+ * - This file owns ONLY the HTTP transport: reading the admin secret from
+ *   validated env, sending it as a header, forwarding the request ID and
+ *   turning GraphQL errors into thrown errors. It holds no domain queries.
+ * - `HasuraService` (services/hasura.service.ts) is where domain operations
+ *   live (escrow status writes, notifications, refund retry counters, ...).
+ *   New code that needs Hasura should add or reuse a `HasuraService` method
+ *   rather than calling this client directly.
+ * - Import from this file directly only when building a new service, or in
+ *   tests that need to mock the transport.
+ */
 import { env } from "../config/env";
-import { queryWithTimeout } from "./postgres";
+import { getCorrelationId } from "../middleware/requestLogger";
 
 interface HasuraResponse<T> {
   data?: T;
@@ -51,7 +68,7 @@ export function createHasuraClient(): HasuraClient {
       options: HasuraRequestOptions = {}
     ): Promise<T> {
       const { url, adminSecret } = requireHasuraConfig();
-      const requestId = options.requestId ?? getRequestId();
+      const requestId = options.requestId ?? getCorrelationId();
       const headers: Record<string, string> = {
         "content-type": "application/json",
         "x-hasura-admin-secret": adminSecret,
@@ -89,63 +106,4 @@ export async function hasuraRequest<T>(
   options: HasuraRequestOptions = {}
 ): Promise<T> {
   return hasuraClient.request<T>(query, variables, options);
-}
-
-export interface EscrowStatusRow {
-  id: string;
-  contract_id: string;
-  status: string;
-  updated_at: string;
-}
-
-interface EscrowStatusQueryResult {
-  escrow_transactions: EscrowStatusRow[];
-}
-
-/**
- * Fetches a sample of recent escrow transactions from Hasura so their stored
- * status can be reconciled against Trustless Work's live state.
- *
- * This is a read-only helper used by the reconciliation job; it does not touch
- * the webhook write path that remains the single authoritative writer of
- * `escrow_transactions.status`.
- */
-export async function fetchRecentEscrowStatuses(
-  limit = 50,
-  options: HasuraRequestOptions = {}
-): Promise<EscrowStatusRow[]> {
-  const query = `
-    query RecentEscrowStatuses($limit: Int!) {
-      escrow_transactions(order_by: { updated_at: desc }, limit: $limit) {
-        id
-        contract_id
-        status
-        updated_at
-      }
-    }
-  `;
-
-  const data = await hasuraRequest<EscrowStatusQueryResult>(query, { limit }, options);
-  return data.escrow_transactions ?? [];
-}
-
-/**
- * Fetches recent escrow statuses directly from Postgres over `DATABASE_URL`.
- *
- * Uses the shared pool in `./postgres`, which applies explicit pool size,
- * idle timeout, connection timeout, and statement timeout settings rather
- * than relying on driver defaults. Prefer this over the Hasura GraphQL path
- * when a direct connection is available.
- */
-export async function fetchRecentEscrowStatusesFromPostgres(
-  limit = 50
-): Promise<EscrowStatusRow[]> {
-  const result = await queryWithTimeout<EscrowStatusRow>(
-    `SELECT id, contract_id, status, updated_at
-       FROM escrow_transactions
-      ORDER BY updated_at DESC
-      LIMIT $1`,
-    [limit]
-  );
-  return result.rows ?? [];
 }

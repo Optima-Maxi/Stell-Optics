@@ -2,7 +2,8 @@
  * DEV-ONLY COMPONENT
  *
  * This component is intentionally kept out of the production bundle.
- * It lives under __dev__/ alongside the test-only GraphQL operations it imports.
+ * It lives in components/dev/ (the single dev-only component directory). The
+ * test-only GraphQL operations it imports live under graphql/**/__dev__/.
  *
  * Do NOT import this component from any production page or provider.
  * If you need it locally, import it inside a `process.env.NODE_ENV !== 'production'`
