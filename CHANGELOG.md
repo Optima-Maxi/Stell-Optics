@@ -9,6 +9,9 @@ below this point are added automatically on release — do not hand-edit them.
 
 ## Migration audit trail
 
+
+
+
 Production deploys now record a human-readable migration history, separate from
 `node-pg-migrate`'s internal `pgmigrations` table. Each deploy logs which
 migrations ran, when they ran, and as part of which deploy/release, so there is
