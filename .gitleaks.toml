@@ -4,6 +4,9 @@
 
 title = "TrueStub Gitleaks Config"
 
+
+
+
 [extend]
 # Use the default rules shipped with gitleaks as the base.
 useDefault = true

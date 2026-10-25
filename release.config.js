@@ -19,6 +19,8 @@
 // per docs/GIT_GUIDELINE.md) to a patch release too, so it isn't silently
 // excluded from ever triggering a release.
 
+
+
 /** @type {import('semantic-release').GlobalConfig} */
 module.exports = {
   branches: ["main"],

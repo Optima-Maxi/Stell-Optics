@@ -9,6 +9,7 @@
   },
   "workspaces": [
     "apps/*"
+    
   ],
   "scripts": {
     "dev": "yarn workspace @truestub/frontend dev",

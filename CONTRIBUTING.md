@@ -1,181 +1,176 @@
-# Contributing to TrueStub
+# Contributing to Stell-Optics
 
-Thanks for your interest in contributing! This is a quick entry point — the
-full contribution and Git workflow guides live in [`docs/`](docs/) and are
-linked below.
+Thank you for your interest in contributing to Stell-Optics.
 
-## Repo layout
+This project is a proposed Stellar-powered Web3 platform that connects blockchain payments with everyday mobile connectivity. Our goal is to make crypto practical for real-world use by enabling XLM-based purchases of mobile data bundles, while keeping the system secure, transparent, and easy to extend.
 
-This is a monorepo. Figure out which workspace your change belongs in
-before you start:
+Please read [README.md](README.md) first so you understand the product vision, the intended architecture, and the roadmap before proposing changes.
 
-| Workspace | What it is | Status |
+## Project vision
+
+Stell-Optics is designed around a simple core idea:
+
+- users connect a Stellar wallet;
+- choose a mobile data bundle;
+- approve an XLM payment;
+- the backend verifies the payment;
+- the provider fulfills the mobile data order;
+- the user receives confirmation and purchase history.
+
+This is an evolving project. Not every capability described in the README is fully implemented yet, and work should be scoped accordingly.
+
+## Where to contribute
+
+The repository is organized around the main parts of the system:
+
+| Area | Purpose | Notes |
 | --- | --- | --- |
-| [`apps/frontend`](apps/frontend/) | The Next.js app — everything most contributions will touch | Active, fully implemented |
-| [`apps/backend`](apps/backend/) | A minimal Express+TS scaffold | Scaffold — see its README's roadmap |
-| [`contracts/`](contracts/) | A placeholder Soroban/Rust Cargo workspace | Placeholder — see its README |
+| [`apps/frontend`](apps/frontend/) | Web experience and dashboard | Planned as the primary user interface |
+| [`apps/backend`](apps/backend/) | FastAPI backend, payment verification, and provider integration | Core business logic lives here |
+| [`contracts`](contracts/) | Soroban / Rust smart contracts | Intended for selected on-chain functionality |
+| [`docs`](docs/) | Architecture, process, and project guidance | Use these for design and workflow context |
+| [`scripts`](scripts/) | Utility scripts and repository automation | Helpful for validation and maintenance |
 
-See the [root README](README.md) for the full pitch and architecture, and
-[`docs/PIVOT_NOTES.md`](docs/PIVOT_NOTES.md) for the history behind this structure.
+Before starting work, identify which layer your change belongs to and keep your patch focused on that part of the system.
 
-## Getting set up
+## Contribution principles
+
+We value practical, secure, and well-documented contributions.
+
+- Keep changes focused and easy to review.
+- Prefer server-side verification over trusting client-provided transaction data.
+- Never request a user’s private keys or seed phrase.
+- Use testnet settings first; do not mix development and production credentials.
+- Document new APIs, flow changes, or assumptions in the relevant docs.
+- If a change is substantial, open or reference an issue first.
+
+## Getting started
 
 ### Prerequisites
 
-- Node.js 20 or later (the root and workspace package manifests enforce this).
-- Corepack enabled, which selects the Yarn 4.9.4 version pinned in the root
-   `package.json`.
+Before contributing, make sure you have the tools needed for the feature area you are working on:
 
-Check the selected Yarn version with `yarn --version`; it should report
-`4.9.4`.
+- Git
+- Node.js and npm
+- Python 3.11 or a compatible version
+- PostgreSQL
+- Rust and Soroban tooling if you are working on contracts
 
-```bash
-git clone https://github.com/<your_user>/stellar-TrueStub
-cd stellar-TrueStub
-corepack enable
-yarn install
-cp apps/frontend/.env.example apps/frontend/.env.local
-```
-
-Before starting the app, fill in the Firebase client settings and a reachable
-Hasura GraphQL endpoint in `apps/frontend/.env.local`. These are needed for
-authentication and data-backed pages; Firebase and Hasura credentials are
-provided by the project maintainer. Trustless Work credentials are only needed
-for escrow operations. See [`apps/frontend/README.md`](apps/frontend/README.md)
-for where each value comes from and which values are optional.
+### Clone and set up
 
 ```bash
-yarn dev              # runs apps/frontend on http://localhost:3000
+git clone https://github.com/Dev-Zully/Stell-Optics.git
+cd Stell-Optics
 ```
 
-The frontend can start without the sibling backend. Features that call it,
-including operator analytics, require `NEXT_PUBLIC_BACKEND_URL` to point at a
-running backend. To run that service locally, copy
-`apps/backend/.env.example` to `apps/backend/.env`, then set `DATABASE_URL`,
-`HASURA_GRAPHQL_URL`, `HASURA_ADMIN_SECRET`, and the Firebase Admin service
-account values. Sentry is optional. Start it in a second terminal with
-`yarn workspace @truestub/backend dev`. Apply SQL migrations with
-`yarn workspace @truestub/backend migrate:up` only when a local Postgres
-database is configured; Hasura metadata must separately track the tables as
-described in [`docs/DATABASE.md`](docs/DATABASE.md).
+Then follow the setup instructions for the relevant component:
 
-## Finding something to work on
+- frontend: see the app-specific setup in [`apps/frontend`](apps/frontend/)
+- backend: see the backend setup in [`apps/backend`](apps/backend/)
+- contracts: use the contract workspace in [`contracts`](contracts/)
 
-Check the [open issues](https://github.com/frienzy514-png/stellar-TrueStub/issues) —
-issues labeled [`good first issue`](https://github.com/frienzy514-png/stellar-TrueStub/labels/good%20first%20issue)
-are a good place to start.
+The project should be developed with a clear separation between:
 
-### `good first issue` label guidelines
+- wallet interaction,
+- payment verification,
+- provider fulfillment,
+- and user-facing order tracking.
 
-The `good first issue` label signals that an issue is genuinely approachable
-for someone new to the codebase. To stay accurate, it is maintained according
-to these criteria:
+## Development workflow
 
-**Criteria for applying the label:**
+1. Fork the repository and create a branch for your work.
+2. Keep your branch aligned with the project goal and scope.
+3. Make small, atomic commits with clear messages.
+4. Validate the relevant app or component before opening a pull request.
+5. Open a pull request describing the problem, the solution, and any risks.
 
-- The change is self-contained: it touches a small, well-bounded area of the
-  codebase and does not require understanding the full system.
-- It has no hard blockers — no unresolved dependencies on other open issues,
-  no pending architectural decisions, and no in-progress related refactors
-  that would conflict.
-- The expected solution and the definition of "done" are clear from the issue
-  description alone; a new contributor should not need to ask many clarifying
-  questions to get started.
-- No specialized domain knowledge is required (e.g., deep Soroban/blockchain
-  internals, complex SQL migration sequencing, or nuanced Firebase Auth flows).
+Suggested branch naming patterns:
 
-**When to remove or query the label:**
+- `feat/...` for new features
+- `fix/...` for bug fixes
+- `docs/...` for documentation updates
+- `chore/...` for maintenance work
 
-An issue can become inaccurate over time even if it was correctly labeled at
-filing. Remove (or leave a comment questioning) the label when:
+## Coding and design expectations
 
-- Comments reveal scope creep or hidden complexity that was not in the original
-  description.
-- Another issue was merged that changes the context and makes the fix less
-  obvious.
-- The issue has accumulated unresolved questions that a first-time contributor
-  would be unable to answer on their own.
+### Web and mobile work
 
-**Periodic audits:**
+- Keep the user flow consistent with the README purchase journey.
+- Make sure data bundle selection, quote generation, and transaction state are clearly understandable.
+- Keep wallet actions explicit and user-controlled.
 
-Maintainers should periodically walk the open `good first issue` list and
-confirm each item still meets the criteria above. When an issue no longer
-qualifies, either relabel it (e.g., `help wanted`) or add a comment explaining
-the new complexity so contributors are not surprised.
+### Backend work
 
-## Workflow
+- Verify payment details independently on the Stellar network.
+- Treat incoming transaction data as untrusted until confirmed server-side.
+- Handle duplicate orders and retries carefully.
+- Preserve transparent order status and error reporting.
 
-1. **Fork and branch** — see [`docs/GIT_GUIDELINE.md`](docs/GIT_GUIDELINE.md)
-   for branch naming (`feat/...`, `fix/...`) and commit message format
-   (`type(scope): description`).
-2. **Make atomic commits** — one logical change per commit.
-3. **Run the relevant workspace's checks before pushing**:
+### Contract work
 
-   ```bash
-   yarn workspace @truestub/frontend lint
-   yarn workspace @truestub/frontend typecheck
-   yarn workspace @truestub/frontend test
-   ```
+- Keep Soroban contracts focused on real on-chain needs.
+- Avoid adding smart contract logic where a secure backend process would be clearer and simpler.
+- Add tests and review the safety assumptions before proposing a production deployment.
 
-   (or the `@truestub/backend` / `cargo test` equivalents if that's what you
-   touched).
-4. **Open a pull request** against `main` using the PR template — fill it
-   out completely; incomplete PRs may be asked to redo it.
+## Testing and verification
 
-The full walkthrough (forking, branch naming, PR expectations) is in
-[`docs/CONTRIBUTORS_GUIDELINE.md`](docs/CONTRIBUTORS_GUIDELINE.md).
+Before submitting a pull request, run the checks that apply to the code you touched.
 
-## ✅ Verify before closing an issue
-
-This project has a recurring pattern: issues get closed by a PR that addresses part
-of the problem, or fixes it in a way that gets reverted by a later conflicting PR,
-without the closer re-verifying the original acceptance criteria against the current
-branch.
-
-**Before marking an issue as resolved (merging the PR or manually closing), run the
-specific grep / test / repro step from the issue's "Acceptance Criteria" against your
-current branch — not just against your PR's own diff.**
-
-If the issue body contains a `verify:` fenced block, run it locally:
+Examples include:
 
 ```bash
-# Example from an issue body:
-# ```verify
-# grep -r "TODO.*getCacheStats" apps/frontend/src/components/performance/CacheStatus.tsx
-# ```
-# A zero-match result (exit 1 / no output) means the fix is in place.
+# frontend
+npm test
+
+# backend
+pytest
+
+# contract workspace
+cargo test
 ```
 
-The PR template includes a corresponding checklist item. Do not skip it.
-If you cannot run the verification step (e.g., it requires secrets), note that
-explicitly in the PR and ask a maintainer to verify on their end.
+Use the app-level or workspace-specific scripts defined in each project folder when available. The goal is not just to pass a broad suite, but to confirm the behavior relevant to your change.
 
-## Tracking mocked / unwired flows
+## Security and responsible development
 
-If you add a `// TODO: Replace with actual API call` marker (or any other
-GraphQL-wiring placeholder), **pair it with a filed tracking issue** and add
-a row to [`docs/GRAPHQL_WIRING_STATUS.md`](docs/GRAPHQL_WIRING_STATUS.md).
-That doc is the single source of truth for which flows are real vs. mocked,
-so keeping it in sync avoids a fresh repo-wide grep every time someone wants
-to know how much of the app is still stubbed.
+Stell-Optics works with blockchain payments and telecom integrations, so security is a first-class concern.
 
-## Reporting bugs
+Please:
 
-Open an issue using the bug report template. Include reproduction steps,
-expected vs. actual behavior, and your environment (Node version, browser,
-etc.).
+- never commit secrets, private keys, or provider credentials;
+- keep environment variables in local configuration or a secure secrets manager;
+- separate Testnet and Mainnet configuration;
+- verify payment status on the server before fulfilling orders;
+- handle idempotency and duplicate processing carefully;
+- document any assumptions around provider failures or delayed delivery.
 
-## Reporting a security vulnerability
+If you are fixing a security issue, do not open a public issue. Use the private reporting process described in the project documentation.
 
-**Do not open a public issue for security vulnerabilities.** See
-[`SECURITY.md`](SECURITY.md) for how to report them privately.
+## Documentation expectations
+
+When changing a workflow, API, or system architecture:
+
+- update the relevant docs,
+- keep examples aligned with the README,
+- describe any implementation status clearly,
+- note whether the behavior is proposed, in progress, or implemented.
+
+This project is an early-stage product vision, so clarity matters as much as correctness.
+
+## Pull requests
+
+When opening a pull request:
+
+- explain the problem and the reason for the change;
+- describe the impact on the user flow or backend behavior;
+- include screenshots or examples when relevant;
+- explain how the change was verified;
+- reference any related issue or discussion.
+
+Keep pull requests focused and reviewable. Large, mixed-purpose changes are harder to validate and maintain.
 
 ## Code of conduct
 
-This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
-By participating, you are expected to uphold it. Please report unacceptable
-behaviour via the process described in [SECURITY.md](SECURITY.md).
+This project follows the Contributor Covenant Code of Conduct. Participation in the project implies respect for the community and the goal of building useful, secure, and accessible blockchain tools.
 
----
-
-Thank you for contributing! 🚀
+Thank you for helping make Stell-Optics more useful, more secure, and more practical for everyday people.
