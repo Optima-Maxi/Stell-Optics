@@ -30,6 +30,7 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
 import * as Sentry from "@sentry/node";
+import { withRetry } from "../lib/retry";
 import { disputeService } from "../services/dispute.service";
 import { changelogService } from "../services/changelog.service";
 import { CHANGELOG_ENTRY_TYPES } from "../services/changelog-taxonomy";
@@ -204,7 +205,9 @@ disputesRouter.get("/mine", async (req: Request, res: Response) => {
 // GET /api/disputes/sla/breaches — must come before /:disputeId
 disputesRouter.get("/sla/breaches", async (req: Request, res: Response) => {
   const requestId = tagSentryWithRequestId(req);
-  const escalated = await disputeService.listDisputesByState("ESCALATED", { requestId });
+  const escalated = await withRetry(() =>
+    disputeService.listDisputesByState("ESCALATED", { requestId }),
+  );
   const now = Date.now();
   const breaches = escalated
     .map((dispute) => {
